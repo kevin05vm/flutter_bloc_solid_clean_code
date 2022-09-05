@@ -15,23 +15,34 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorBackground,
       appBar: AppBar(
-        backgroundColor: colorAppBar,
+        backgroundColor: colorAppBar, 
         title: const Text('Meme App')
       ),
       body: BlocBuilder<HomeBloc, HomeState>(
         builder: (_, homeState) {
-          if(homeState is HomeLoadingState) return const Center(child: CircularProgressIndicator());
-          if(homeState is HomeLoadMemesState) {
-            return ListView.builder(
-              itemCount: homeState.memes.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  child: CardMeme(meme: homeState.memes[index]),
-                  onTap: () {
-                    Navigator.of(context).pushNamed(Routes.routeDetail);
-                  }
-                );
-              }
+          if (homeState is HomeLoadingState) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (homeState is HomeLoadMemesState) {
+            return CustomScrollView(
+              slivers: [
+                const SliverToBoxAdapter(
+                  child: Placeholder(fallbackHeight: 200)
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return InkWell(
+                        child: CardMeme(meme: homeState.memes[index]),
+                        onTap: () {
+                          Navigator.of(context).pushNamed(Routes.routeDetail);
+                        }
+                      );
+                    }, 
+                    childCount: homeState.memes.length
+                  )
+                )
+              ]
             );
           }
           return const Center(child: Text('Error Api....'));
